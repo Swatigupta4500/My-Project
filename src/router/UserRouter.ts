@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { UserController } from "../controllers/UserController";
 import { createValidator } from "express-joi-validation";
-import { userIdValidation, userLoginValidation, userSignUpValidation } from "../validators/Uservalidators";
+import { userIdValidation, userLoginValidation, userSignUpValidation, verifyUserForResendEmail, userEmailValidation } from "../validators/Uservalidators";
 const userController = new UserController();
 const validator = createValidator();
 
@@ -20,6 +20,7 @@ class UserRouter {
   getRoutes() {
     this.router.get("/", userController.getAllUsers);
     this.router.get("/:id", [validator.params(userIdValidation)], userController.getUser);
+    this.router.get("/send/verification/email",  [validator.query(verifyUserForResendEmail)], userController.resendVerificationEmail);
   }
 
   postRoutes() {
@@ -27,7 +28,9 @@ class UserRouter {
     this.router.post("/signUp",[validator.body(userSignUpValidation)],userController.signUp);
   }
   putRoutes() {}
-  patchRoutes() {}
+  patchRoutes() {
+    this.router.patch("/verify", [validator.params(userEmailValidation)], userController.verify);
+  }
   deleteRoutes() {}
 }
 

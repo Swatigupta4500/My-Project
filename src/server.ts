@@ -1,12 +1,30 @@
 import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as mongoose from "mongoose";
+import * as cors from "cors";
 import { getEnvironmentVariable } from "./environments/environment";
 import UserRouter from "./router/UserRouter";
 import ItemRouter from "./router/ItemRouter";
 
 export class Server {
   public app: express.Application = express();
+
+  function1(req, res, next) {
+    console.log(1);
+    next();
+  }
+  function2(req, res, next) {
+    console.log(2);
+    next();
+  }
+  function3(req, res, next) {
+    console.log(3);
+    next();
+  }
+  function4(req, res, next) {
+    console.log(4);
+    next();
+  }
 
   constructor() {
     this.setConfigs();
@@ -18,6 +36,7 @@ export class Server {
 
   setConfigs() {
     this.connectMongoDB();
+    // this.allowcors();
     this.configurebodyParser();
   }
 
@@ -28,6 +47,11 @@ export class Server {
   }
 
   setRoutes() {
+    // this.app.use(this.function1);
+    // this.app.use(this.function2);
+    // this.app.use(this.function3);
+    // this.app.use(this.function4);
+
     this.app.use("/api/user", UserRouter);
     this.app.use("/api/item", ItemRouter);
   }
@@ -39,6 +63,10 @@ export class Server {
         extended: true,
       })
     );
+  }
+
+  allowcors() {
+    this.app.use(cors);
   }
 
   error404Handler() {
@@ -53,6 +81,12 @@ export class Server {
   handleError() {
     this.app.use((error, req, res, next) => {
       const errorStatus = res.errorStatus || 500;
+      if (error.message) {
+        res.status(400).json({
+          msg: error.message,
+          status:400
+        });
+      }
       res.status(404).json({
         msg: error.message || "something went wrong, please try again",
         status_code: errorStatus,
